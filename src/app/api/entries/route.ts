@@ -3,6 +3,19 @@ import { auth } from "@/lib/auth";
 import { db } from "@/db";
 import { entries, photos } from "@/db/schema";
 import { eq, desc } from "drizzle-orm";
+import { head } from "@vercel/blob";
+
+async function refreshUrl(url: string): Promise<string> {
+  if (url.includes("blob.vercel-storage.com")) {
+    try {
+      const blob = await head(url);
+      return blob.downloadUrl;
+    } catch {
+      return url;
+    }
+  }
+  return url;
+}
 
 export async function GET() {
   const all = await db
@@ -36,10 +49,16 @@ export async function GET() {
     }
   }
 
-  const result = Array.from(grouped.values()).map((entry) => ({
-    ...entry,
-    photos: entry.photos.sort((a, b) => a.order - b.order),
-  }));
+  const result = await Promise.all(
+    Array.from(grouped.values()).map(async (entry) => {
+      const refreshed = await Promise.all(
+        entry.photos
+          .sort((a, b) => a.order - b.order)
+          .map(async (p) => ({ ...p, url: await refreshUrl(p.url) }))
+      );
+      return { ...entry, photos: refreshed };
+    })
+  );
 
   return NextResponse.json(result);
 }

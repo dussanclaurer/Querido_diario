@@ -30,7 +30,7 @@ export async function POST(req: NextRequest) {
             access: "private",
             contentType: "image/webp",
           });
-          return blob.url;
+          return blob.downloadUrl;
         }
 
         const uploadDir = join(process.cwd(), "public", "uploads");

@@ -2,6 +2,19 @@ import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
 import { entries, photos } from "@/db/schema";
 import { eq } from "drizzle-orm";
+import { head } from "@vercel/blob";
+
+async function refreshUrl(url: string): Promise<string> {
+  if (url.includes("blob.vercel-storage.com")) {
+    try {
+      const blob = await head(url);
+      return blob.downloadUrl;
+    } catch {
+      return url;
+    }
+  }
+  return url;
+}
 
 export async function GET(
   _request: NextRequest,
@@ -25,5 +38,9 @@ export async function GET(
     .where(eq(photos.entryId, id))
     .orderBy(photos.order);
 
-  return NextResponse.json({ ...entry, photos: entryPhotos });
+  const refreshed = await Promise.all(
+    entryPhotos.map(async (p) => ({ ...p, url: await refreshUrl(p.url) }))
+  );
+
+  return NextResponse.json({ ...entry, photos: refreshed });
 }
