@@ -2,6 +2,7 @@
 
 import { useState, useCallback } from "react";
 import { useDropzone } from "react-dropzone";
+import { optimizeImage } from "@/lib/imageOptimizer";
 import styles from "./PhotoUploader.module.css";
 
 type Props = {
@@ -21,8 +22,19 @@ export function PhotoUploader({ onUploadComplete }: Props) {
       const thumbs = accepted.map((f) => URL.createObjectURL(f));
       setPreviews(thumbs);
 
+      const optimized = await Promise.all(
+        accepted.map((f) => optimizeImage(f))
+      );
+
+      const optimizedFiles = optimized.map(
+        (blob, i) =>
+          new File([blob], accepted[i].name.replace(/\.[^.]+$/, ".webp"), {
+            type: "image/webp",
+          })
+      );
+
       const formData = new FormData();
-      accepted.forEach((f) => formData.append("files", f));
+      optimizedFiles.forEach((f) => formData.append("files", f));
 
       const res = await fetch("/api/upload", { method: "POST", body: formData });
       const data = await res.json();
@@ -50,7 +62,7 @@ export function PhotoUploader({ onUploadComplete }: Props) {
         {uploading ? (
           <div className={styles.status}>
             <div className={styles.spinner} />
-            <p>Subiendo y convirtiendo fotos...</p>
+            <p>Comprimiendo y subiendo fotos...</p>
           </div>
         ) : (
           <div className={styles.placeholder}>
