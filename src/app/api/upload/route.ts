@@ -27,7 +27,7 @@ export async function POST(req: NextRequest) {
 
         if (useBlob) {
           const blob = await put(filename, buffer, {
-            access: "public",
+            access: "private",
             contentType: "image/webp",
           });
           return blob.url;
