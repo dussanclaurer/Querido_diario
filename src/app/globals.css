@@ -37,9 +37,7 @@ html {
 
 body {
   min-height: 100vh;
-  background:
-    linear-gradient(rgba(254, 252, 243, 0.88), rgba(254, 252, 243, 0.88)),
-    url('/fondo.jpg') center / cover fixed;
+  background: url('/fondo.jpg') center / cover fixed;
 }
 
 img {
