@@ -2,7 +2,6 @@
 
 import { useState, useCallback } from "react";
 import { useDropzone } from "react-dropzone";
-import { optimizeImage } from "@/lib/imageOptimizer";
 import styles from "./PhotoUploader.module.css";
 
 type Props = {
@@ -12,38 +11,22 @@ type Props = {
 export function PhotoUploader({ onUploadComplete }: Props) {
   const [previews, setPreviews] = useState<string[]>([]);
   const [uploading, setUploading] = useState(false);
-  const [progress, setProgress] = useState(0);
 
   const onDrop = useCallback(
     async (accepted: File[]) => {
       if (!accepted.length) return;
 
       setUploading(true);
-      setProgress(0);
 
       const thumbs = accepted.map((f) => URL.createObjectURL(f));
       setPreviews(thumbs);
 
-      const optimized = await Promise.all(
-        accepted.map((f) => optimizeImage(f))
-      );
-
-      const optimizedFiles = optimized.map(
-        (blob, i) =>
-          new File([blob], accepted[i].name.replace(/\.[^.]+$/, ".webp"), {
-            type: "image/webp",
-          })
-      );
-
-      setProgress(30);
-
       const formData = new FormData();
-      optimizedFiles.forEach((f) => formData.append("files", f));
+      accepted.forEach((f) => formData.append("files", f));
 
       const res = await fetch("/api/upload", { method: "POST", body: formData });
       const data = await res.json();
 
-      setProgress(100);
       setUploading(false);
       onUploadComplete(data.urls);
     },
@@ -67,13 +50,7 @@ export function PhotoUploader({ onUploadComplete }: Props) {
         {uploading ? (
           <div className={styles.status}>
             <div className={styles.spinner} />
-            <p>Comprimiendo y subiendo fotos...</p>
-            <div className={styles.progressBar}>
-              <div
-                className={styles.progressFill}
-                style={{ width: `${progress}%` }}
-              />
-            </div>
+            <p>Subiendo y convirtiendo fotos...</p>
           </div>
         ) : (
           <div className={styles.placeholder}>

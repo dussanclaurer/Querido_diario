@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { put } from "@vercel/blob";
 import { auth } from "@/lib/auth";
+import sharp from "sharp";
 
 export async function POST(req: NextRequest) {
   const session = await auth();
@@ -14,9 +15,24 @@ export async function POST(req: NextRequest) {
     return NextResponse.json({ error: "No files provided" }, { status: 400 });
   }
 
-  const results = await Promise.all(
-    files.map((file) => put(file.name, file, { access: "public" }))
+  const urls = await Promise.all(
+    files.map(async (file) => {
+      const rawBuffer = Buffer.from(await file.arrayBuffer());
+
+      const optimizedBuffer = await sharp(rawBuffer)
+        .resize(1920, 1920, { fit: "inside", withoutEnlargement: true })
+        .webp({ quality: 80 })
+        .toBuffer();
+
+      const name = file.name.replace(/\.[^.]+$/, ".webp");
+      const blob = await put(name, optimizedBuffer, {
+        access: "public",
+        contentType: "image/webp",
+      });
+
+      return blob.url;
+    })
   );
 
-  return NextResponse.json({ urls: results.map((r) => r.url) });
+  return NextResponse.json({ urls });
 }
