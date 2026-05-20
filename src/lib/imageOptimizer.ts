@@ -3,7 +3,16 @@ export async function optimizeImage(
   maxDimension = 1920,
   quality = 0.8
 ): Promise<Blob> {
-  const img = await createImageBitmap(file);
+  const img = new Image();
+  const url = URL.createObjectURL(file);
+
+  await new Promise<void>((resolve, reject) => {
+    img.onload = () => resolve();
+    img.onerror = () => reject(new Error("Failed to load image"));
+    img.src = url;
+  });
+
+  URL.revokeObjectURL(url);
 
   let { width, height } = img;
   if (width > maxDimension || height > maxDimension) {
@@ -12,11 +21,13 @@ export async function optimizeImage(
     height = Math.round(height * ratio);
   }
 
-  const canvas = new OffscreenCanvas(width, height);
+  const canvas = document.createElement("canvas");
+  canvas.width = width;
+  canvas.height = height;
   const ctx = canvas.getContext("2d")!;
   ctx.drawImage(img, 0, 0, width, height);
-  img.close();
 
-  const blob = await canvas.convertToBlob({ type: "image/webp", quality });
-  return blob;
+  return new Promise((resolve) =>
+    canvas.toBlob((blob) => resolve(blob!), "image/webp", quality)
+  );
 }

@@ -37,6 +37,12 @@ export function PhotoUploader({ onUploadComplete }: Props) {
       optimizedFiles.forEach((f) => formData.append("files", f));
 
       const res = await fetch("/api/upload", { method: "POST", body: formData });
+      if (!res.ok) {
+        const err = await res.json();
+        console.error("Upload failed:", err);
+        setUploading(false);
+        return;
+      }
       const data = await res.json();
 
       setUploading(false);
