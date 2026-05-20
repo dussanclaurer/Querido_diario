@@ -17,9 +17,9 @@ export const entries = pgTable("entries", {
 export const photos = pgTable("photos", {
   id: uuid("id").defaultRandom().primaryKey(),
   entryId: uuid("entry_id")
-    .notNull()
     .references(() => entries.id, { onDelete: "cascade" }),
   url: text("url").notNull(),
   order: smallint("order").notNull().default(0),
+  data: text("data"),
   createdAt: timestamp("created_at").defaultNow(),
 });

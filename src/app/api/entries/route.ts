@@ -2,20 +2,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/db";
 import { entries, photos } from "@/db/schema";
-import { eq, desc } from "drizzle-orm";
-import { head } from "@vercel/blob";
-
-async function refreshUrl(url: string): Promise<string> {
-  if (url.includes("blob.vercel-storage.com")) {
-    try {
-      const blob = await head(url);
-      return blob.downloadUrl;
-    } catch {
-      return url;
-    }
-  }
-  return url;
-}
+import { eq, desc, inArray } from "drizzle-orm";
 
 export async function GET() {
   const all = await db
@@ -49,16 +36,10 @@ export async function GET() {
     }
   }
 
-  const result = await Promise.all(
-    Array.from(grouped.values()).map(async (entry) => {
-      const refreshed = await Promise.all(
-        entry.photos
-          .sort((a, b) => a.order - b.order)
-          .map(async (p) => ({ ...p, url: await refreshUrl(p.url) }))
-      );
-      return { ...entry, photos: refreshed };
-    })
-  );
+  const result = Array.from(grouped.values()).map((entry) => ({
+    ...entry,
+    photos: entry.photos.sort((a, b) => a.order - b.order),
+  }));
 
   return NextResponse.json(result);
 }
@@ -87,13 +68,10 @@ export async function POST(req: NextRequest) {
     .then((r) => r[0]);
 
   if (imageUrls.length > 0) {
-    await db.insert(photos).values(
-      imageUrls.map((url: string, i: number) => ({
-        entryId: entry.id,
-        url,
-        order: i,
-      }))
-    );
+    await db
+      .update(photos)
+      .set({ entryId: entry.id })
+      .where(inArray(photos.url, imageUrls));
   }
 
   return NextResponse.json(entry, { status: 201 });

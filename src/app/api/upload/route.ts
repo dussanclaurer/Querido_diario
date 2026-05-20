@@ -1,8 +1,7 @@
-import { writeFile, mkdir } from "fs/promises";
-import { join } from "path";
-import { put } from "@vercel/blob";
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
+import { db } from "@/db";
+import { photos } from "@/db/schema";
 
 export async function POST(req: NextRequest) {
   try {
@@ -17,26 +16,18 @@ export async function POST(req: NextRequest) {
       return NextResponse.json({ error: "No files provided" }, { status: 400 });
     }
 
-    const useBlob = !!process.env.BLOB_READ_WRITE_TOKEN && !!process.env.VERCEL;
-
     const urls = await Promise.all(
       files.map(async (file) => {
         const buffer = Buffer.from(await file.arrayBuffer());
         const id = crypto.randomUUID();
-        const filename = `${id}.webp`;
-
-        if (useBlob) {
-          const blob = await put(filename, buffer, {
-            access: "private",
-            contentType: "image/webp",
-          });
-          return blob.downloadUrl;
-        }
-
-        const uploadDir = join(process.cwd(), "public", "uploads");
-        await mkdir(uploadDir, { recursive: true });
-        await writeFile(join(uploadDir, filename), buffer);
-        return `/uploads/${filename}`;
+        const base64 = buffer.toString("base64");
+        await db.insert(photos).values({
+          id,
+          data: base64,
+          url: `/api/photo/${id}`,
+          order: 0,
+        });
+        return `/api/photo/${id}`;
       })
     );
 

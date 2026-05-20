@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
 import { db } from "@/db";
-import { entries, photos } from "@/db/schema";
+import { photos } from "@/db/schema";
 import { eq } from "drizzle-orm";
 
 export async function GET(
@@ -9,21 +9,22 @@ export async function GET(
 ) {
   const { id } = await params;
 
-  const entry = await db
+  const photo = await db
     .select()
-    .from(entries)
-    .where(eq(entries.id, id))
+    .from(photos)
+    .where(eq(photos.id, id))
     .then((r) => r[0]);
 
-  if (!entry) {
+  if (!photo || !photo.data) {
     return NextResponse.json({ error: "Not found" }, { status: 404 });
   }
 
-  const entryPhotos = await db
-    .select()
-    .from(photos)
-    .where(eq(photos.entryId, id))
-    .orderBy(photos.order);
+  const buffer = Buffer.from(photo.data, "base64");
 
-  return NextResponse.json({ ...entry, photos: entryPhotos });
+  return new NextResponse(buffer, {
+    headers: {
+      "Content-Type": "image/webp",
+      "Cache-Control": "public, max-age=31536000, immutable",
+    },
+  });
 }
