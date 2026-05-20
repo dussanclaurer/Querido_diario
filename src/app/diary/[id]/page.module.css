@@ -4,21 +4,24 @@
   padding: 40px 20px 80px;
 }
 
-.imageWrap {
-  border-radius: var(--radius);
-  overflow: hidden;
-  box-shadow: var(--shadow-lg);
-  background: #f0f0f0;
-}
-
-.image {
-  width: 100%;
-  max-height: 70vh;
-  object-fit: contain;
-}
-
 .info {
   margin-top: 24px;
+  padding: 20px;
+  background: var(--cream);
+  border-radius: var(--radius);
+  border: 1px solid var(--gold-light);
+  position: relative;
+}
+
+.info::before {
+  content: "❝";
+  position: absolute;
+  top: -10px;
+  left: 16px;
+  font-size: 2rem;
+  color: var(--gold);
+  opacity: 0.5;
+  font-family: serif;
 }
 
 .date {
@@ -32,4 +35,6 @@
   margin-top: 12px;
   font-size: 1.15rem;
   line-height: 1.6;
+  color: var(--text);
+  font-style: italic;
 }

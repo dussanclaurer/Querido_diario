@@ -1,7 +1,8 @@
 import { db } from "@/db";
-import { entries } from "@/db/schema";
+import { entries, photos } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
+import { PhotoGallery } from "@/components/PhotoGallery/PhotoGallery";
 import styles from "./page.module.css";
 
 export const dynamic = "force-dynamic";
@@ -16,9 +17,15 @@ export default async function DiaryEntry({
     .select()
     .from(entries)
     .where(eq(entries.id, id))
-    .then((res) => res[0]);
+    .then((r) => r[0]);
 
   if (!entry) notFound();
+
+  const entryPhotos = await db
+    .select()
+    .from(photos)
+    .where(eq(photos.entryId, id))
+    .orderBy(photos.order);
 
   const date = entry.createdAt
     ? new Date(entry.createdAt).toLocaleDateString("es", {
@@ -30,13 +37,7 @@ export default async function DiaryEntry({
 
   return (
     <div className={styles.page}>
-      <div className={styles.imageWrap}>
-        <img
-          src={entry.imageUrl}
-          alt={entry.description || "Entrada del diario"}
-          className={styles.image}
-        />
-      </div>
+      <PhotoGallery photos={entryPhotos} />
       <div className={styles.info}>
         <time className={styles.date}>{date}</time>
         {entry.description && (

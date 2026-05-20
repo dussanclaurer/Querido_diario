@@ -4,9 +4,9 @@ import styles from "./PhotoGrid.module.css";
 type Entry = {
   id: string;
   userId: string;
-  imageUrl: string;
   description: string | null;
   createdAt: Date | null;
+  photos: { id: string; url: string }[];
 };
 
 export function PhotoGrid({ entries }: { entries: Entry[] }) {

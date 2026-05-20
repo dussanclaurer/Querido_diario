@@ -9,7 +9,7 @@ export async function Header() {
     <header className={styles.header}>
       <div className={styles.inner}>
         <Link href="/" className={styles.logo}>
-          Querido Diario
+          <span className={styles.crown}>👑</span> Querido Diario
         </Link>
         <nav className={styles.nav}>
           {session?.user ? (

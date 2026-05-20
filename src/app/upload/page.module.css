@@ -5,9 +5,16 @@
 }
 
 .title {
+  font-family: var(--font-heading);
   font-size: 1.75rem;
   font-weight: 700;
   margin-bottom: 24px;
+  color: var(--text);
+}
+
+.title::before {
+  content: "✿ ";
+  color: var(--rose);
 }
 
 .form {
@@ -34,21 +41,23 @@
 
 .textarea {
   padding: 12px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--rose);
   border-radius: 8px;
   font-size: 0.95rem;
   resize: vertical;
   transition: border-color 0.2s;
+  background: var(--cream);
 }
 
 .textarea:focus {
   outline: none;
-  border-color: var(--accent);
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.15);
 }
 
 .submit {
   padding: 12px 24px;
-  background: var(--accent);
+  background: var(--rose-dark);
   color: white;
   border: none;
   border-radius: 8px;
@@ -58,7 +67,7 @@
 }
 
 .submit:hover:not(:disabled) {
-  background: var(--accent-hover);
+  background: var(--rose);
 }
 
 .submit:disabled {

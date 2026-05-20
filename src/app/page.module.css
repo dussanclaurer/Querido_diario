@@ -7,17 +7,35 @@
 .hero {
   text-align: center;
   margin-bottom: 48px;
+  position: relative;
+}
+
+.hero::after {
+  content: "✦ ✦ ✦";
+  display: block;
+  margin-top: 16px;
+  font-size: 0.9rem;
+  letter-spacing: 8px;
+  color: var(--rose);
+  opacity: 0.6;
 }
 
 .title {
-  font-size: 2.5rem;
-  font-weight: 800;
-  letter-spacing: -0.03em;
+  font-family: var(--font-heading);
+  font-size: 2.8rem;
+  font-weight: 700;
+  letter-spacing: -0.02em;
   line-height: 1.1;
+  color: var(--text);
+}
+
+.ornament {
+  font-size: 2rem;
 }
 
 .subtitle {
   margin-top: 10px;
   color: var(--text-muted);
-  font-size: 1.1rem;
+  font-size: 1.15rem;
+  font-style: italic;
 }

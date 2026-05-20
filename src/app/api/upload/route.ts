@@ -9,11 +9,14 @@ export async function POST(req: NextRequest) {
   }
 
   const formData = await req.formData();
-  const file = formData.get("file") as File | null;
-  if (!file) {
-    return NextResponse.json({ error: "No file provided" }, { status: 400 });
+  const files = formData.getAll("files") as File[];
+  if (!files.length) {
+    return NextResponse.json({ error: "No files provided" }, { status: 400 });
   }
 
-  const blob = await put(file.name, file, { access: "public" });
-  return NextResponse.json({ url: blob.url });
+  const results = await Promise.all(
+    files.map((file) => put(file.name, file, { access: "public" }))
+  );
+
+  return NextResponse.json({ urls: results.map((r) => r.url) });
 }

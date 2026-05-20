@@ -2,7 +2,7 @@
   display: flex;
   justify-content: center;
   align-items: center;
-  min-height: calc(100vh - 60px);
+  min-height: calc(100vh - 64px);
   padding: 40px 20px;
 }
 
@@ -13,13 +13,30 @@
   border-radius: var(--radius);
   padding: 40px;
   box-shadow: var(--shadow-lg);
+  border: 1px solid var(--gold-light);
+  position: relative;
+}
+
+.card::before {
+  content: "✿ ✿ ✿";
+  position: absolute;
+  top: -10px;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: 0.8rem;
+  letter-spacing: 6px;
+  color: var(--rose);
+  background: var(--bg-card);
+  padding: 0 12px;
 }
 
 .title {
+  font-family: var(--font-heading);
   font-size: 1.5rem;
   font-weight: 700;
   text-align: center;
   margin-bottom: 24px;
+  color: var(--text);
 }
 
 .form {
@@ -41,15 +58,17 @@
 
 .field input {
   padding: 10px 12px;
-  border: 1px solid var(--border);
+  border: 1px solid var(--rose);
   border-radius: 8px;
   font-size: 0.95rem;
   transition: border-color 0.2s;
+  background: var(--cream);
 }
 
 .field input:focus {
   outline: none;
-  border-color: var(--accent);
+  border-color: var(--gold);
+  box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.12);
 }
 
 .error {
@@ -63,7 +82,7 @@
 
 .submit {
   padding: 12px;
-  background: var(--accent);
+  background: var(--rose-dark);
   color: white;
   border: none;
   border-radius: 8px;
@@ -73,7 +92,7 @@
 }
 
 .submit:hover {
-  background: var(--accent-hover);
+  background: var(--rose);
 }
 
 .footer {
@@ -84,7 +103,7 @@
 }
 
 .footer a {
-  color: var(--accent);
+  color: var(--rose-dark);
   font-weight: 500;
 }
 
