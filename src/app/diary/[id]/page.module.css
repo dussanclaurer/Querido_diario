@@ -1,0 +1,35 @@
+.page {
+  max-width: 800px;
+  margin: 0 auto;
+  padding: 40px 20px 80px;
+}
+
+.imageWrap {
+  border-radius: var(--radius);
+  overflow: hidden;
+  box-shadow: var(--shadow-lg);
+  background: #f0f0f0;
+}
+
+.image {
+  width: 100%;
+  max-height: 70vh;
+  object-fit: contain;
+}
+
+.info {
+  margin-top: 24px;
+}
+
+.date {
+  font-size: 0.85rem;
+  color: var(--text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.desc {
+  margin-top: 12px;
+  font-size: 1.15rem;
+  line-height: 1.6;
+}
