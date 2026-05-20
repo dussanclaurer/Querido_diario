@@ -1,5 +1,5 @@
 import { db } from "@/db";
-import { entries, photos } from "@/db/schema";
+import { entries, photos, users } from "@/db/schema";
 import { eq } from "drizzle-orm";
 import { notFound } from "next/navigation";
 import { PhotoGallery } from "@/components/PhotoGallery/PhotoGallery";
@@ -13,13 +13,22 @@ export default async function DiaryEntry({
   params: Promise<{ id: string }>;
 }) {
   const { id } = await params;
-  const entry = await db
+
+  const row = await db
     .select()
     .from(entries)
+    .leftJoin(users, eq(entries.userId, users.id))
     .where(eq(entries.id, id))
     .then((r) => r[0]);
 
-  if (!entry) notFound();
+  if (!row) notFound();
+
+  const u = row.users;
+  const entry = {
+    ...row.entries,
+    authorName: u?.username ?? "Anónimo",
+    authorAvatar: u?.avatar ? `/api/avatar/${u.id}` : null,
+  };
 
   const entryPhotos = await db
     .select()
@@ -39,7 +48,21 @@ export default async function DiaryEntry({
     <div className={styles.page}>
       <PhotoGallery photos={entryPhotos} />
       <div className={styles.info}>
-        <time className={styles.date}>{date}</time>
+        <div className={styles.authorRow}>
+          <div className={styles.avatar}>
+            {entry.authorAvatar ? (
+              <img src={entry.authorAvatar} alt="" className={styles.avatarImg} />
+            ) : (
+              <span className={styles.avatarLetter}>
+                {entry.authorName.charAt(0).toUpperCase()}
+              </span>
+            )}
+          </div>
+          <div>
+            <span className={styles.authorName}>{entry.authorName}</span>
+            <time className={styles.date}>{date}</time>
+          </div>
+        </div>
         {entry.description && (
           <p className={styles.desc}>{entry.description}</p>
         )}

@@ -37,10 +37,10 @@ export default function LoginPage() {
         <form className={styles.form} onSubmit={handleSubmit}>
           {error && <p className={styles.error}>{error}</p>}
           <div className={styles.field}>
-            <label htmlFor="email">Email</label>
+            <label htmlFor="email">Email o usuario</label>
             <input
               id="email"
-              type="email"
+              type="text"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
               required

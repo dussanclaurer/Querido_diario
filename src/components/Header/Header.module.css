@@ -38,7 +38,7 @@
 
 .nav {
   display: flex;
-  gap: 12px;
+  gap: 10px;
   align-items: center;
 }
 
@@ -57,6 +57,56 @@
 
 .btn:hover {
   background: var(--rose);
+}
+
+.userBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  padding: 6px 14px;
+  border-radius: 8px;
+  font-size: 0.875rem;
+  font-weight: 500;
+  color: var(--text);
+  transition: background 0.2s;
+}
+
+.userBtn:hover {
+  background: var(--pink-light);
+}
+
+.userAvatar {
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  overflow: hidden;
+  background: var(--pink-light);
+  flex-shrink: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.avatarImg {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.avatarLetter {
+  font-size: 0.8rem;
+  font-weight: 700;
+  color: var(--rose-dark);
+}
+
+.userName {
+  display: none;
+}
+
+@media (min-width: 640px) {
+  .userName {
+    display: inline;
+  }
 }
 
 .btnOutline {

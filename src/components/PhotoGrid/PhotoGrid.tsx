@@ -7,6 +7,8 @@ type Entry = {
   description: string | null;
   createdAt: Date | null;
   photos: { id: string; url: string }[];
+  authorName: string;
+  authorAvatar: string | null;
 };
 
 export function PhotoGrid({ entries }: { entries: Entry[] }) {

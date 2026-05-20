@@ -7,6 +7,8 @@ type Entry = {
   description: string | null;
   createdAt: Date | null;
   photos: { id: string; url: string }[];
+  authorName: string;
+  authorAvatar: string | null;
 };
 
 export function DiaryCard({ entry }: { entry: Entry }) {
@@ -37,6 +39,18 @@ export function DiaryCard({ entry }: { entry: Entry }) {
         {extra > 0 && <span className={styles.badge}>+{extra}</span>}
       </div>
       <div className={styles.info}>
+        <div className={styles.authorRow}>
+          <div className={styles.avatar}>
+            {entry.authorAvatar ? (
+              <img src={entry.authorAvatar} alt="" className={styles.avatarImg} />
+            ) : (
+              <span className={styles.avatarLetter}>
+                {entry.authorName.charAt(0).toUpperCase()}
+              </span>
+            )}
+          </div>
+          <span className={styles.authorName}>{entry.authorName}</span>
+        </div>
         <time className={styles.date}>{date}</time>
         {entry.description && (
           <p className={styles.desc}>{entry.description}</p>

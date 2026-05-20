@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from "next/server";
 import { auth } from "@/lib/auth";
 import { db } from "@/db";
-import { entries, photos } from "@/db/schema";
+import { entries, photos, users } from "@/db/schema";
 import { eq, desc, inArray } from "drizzle-orm";
 
 export async function GET() {
@@ -9,6 +9,7 @@ export async function GET() {
     .select()
     .from(entries)
     .leftJoin(photos, eq(photos.entryId, entries.id))
+    .leftJoin(users, eq(entries.userId, users.id))
     .orderBy(desc(entries.createdAt));
 
   const grouped = new Map<
@@ -19,13 +20,21 @@ export async function GET() {
       description: string | null;
       createdAt: Date | null;
       photos: { id: string; url: string; order: number }[];
+      authorName: string;
+      authorAvatar: string | null;
     }
   >();
 
   for (const row of all) {
     const e = row.entries;
+    const u = row.users;
     if (!grouped.has(e.id)) {
-      grouped.set(e.id, { ...e, photos: [] });
+      grouped.set(e.id, {
+        ...e,
+        photos: [],
+        authorName: u?.username ?? "Anónimo",
+        authorAvatar: u?.avatar ? `/api/avatar/${u.id}` : null,
+      });
     }
     if (row.photos) {
       grouped.get(e.id)!.photos.push({

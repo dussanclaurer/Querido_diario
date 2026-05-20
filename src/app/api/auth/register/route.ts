@@ -2,14 +2,14 @@ import { NextRequest, NextResponse } from "next/server";
 import { hash } from "bcryptjs";
 import { db } from "@/db";
 import { users } from "@/db/schema";
-import { eq } from "drizzle-orm";
+import { eq, or } from "drizzle-orm";
 
 export async function POST(req: NextRequest) {
-  const { email, password } = await req.json();
+  const { username, email, password } = await req.json();
 
-  if (!email || !password || password.length < 6) {
+  if (!username || !email || !password || password.length < 6) {
     return NextResponse.json(
-      { error: "Email válido y contraseña de al menos 6 caracteres requeridos" },
+      { error: "Usuario, email y contraseña de al menos 6 caracteres requeridos" },
       { status: 400 }
     );
   }
@@ -17,20 +17,22 @@ export async function POST(req: NextRequest) {
   const existing = await db
     .select()
     .from(users)
-    .where(eq(users.email, email))
+    .where(or(eq(users.email, email), eq(users.username, username)))
     .then((res) => res[0]);
 
   if (existing) {
-    return NextResponse.json(
-      { error: "Este email ya está registrado" },
-      { status: 409 }
-    );
+    const msg =
+      existing.email === email
+        ? "Este email ya está registrado"
+        : "Este nombre de usuario ya está en uso";
+    return NextResponse.json({ error: msg }, { status: 409 });
   }
 
   const hashedPassword = await hash(password, 12);
 
   await db.insert(users).values({
     id: crypto.randomUUID(),
+    username,
     email,
     password: hashedPassword,
   });

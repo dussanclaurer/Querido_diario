@@ -15,11 +15,27 @@ export async function Header() {
           {session?.user ? (
             <>
               <Link href="/upload" className={styles.btn}>Subir foto</Link>
+              <Link href="/profile" className={styles.userBtn}>
+                <div className={styles.userAvatar}>
+                  {session.user.avatar ? (
+                    <img
+                      src={`/api/avatar/${session.user.id}`}
+                      alt=""
+                      className={styles.avatarImg}
+                    />
+                  ) : (
+                    <span className={styles.avatarLetter}>
+                      {(session.user.username ?? "?").charAt(0).toUpperCase()}
+                    </span>
+                  )}
+                </div>
+                <span className={styles.userName}>{session.user.username}</span>
+              </Link>
               <form action={async () => {
                 "use server";
                 await signOut();
               }}>
-                <button type="submit" className={styles.btnOutline}>Cerrar sesión</button>
+                <button type="submit" className={styles.btnOutline}>Salir</button>
               </form>
             </>
           ) : (

@@ -7,6 +7,7 @@ import styles from "./page.module.css";
 
 export default function RegisterPage() {
   const router = useRouter();
+  const [username, setUsername] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
   const [error, setError] = useState("");
@@ -18,7 +19,7 @@ export default function RegisterPage() {
     const res = await fetch("/api/auth/register", {
       method: "POST",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ email, password }),
+      body: JSON.stringify({ username, email, password }),
     });
 
     if (!res.ok) {
@@ -36,6 +37,17 @@ export default function RegisterPage() {
         <h1 className={styles.title}>Crear cuenta</h1>
         <form className={styles.form} onSubmit={handleSubmit}>
           {error && <p className={styles.error}>{error}</p>}
+          <div className={styles.field}>
+            <label htmlFor="username">Apodo</label>
+            <input
+              id="username"
+              type="text"
+              value={username}
+              onChange={(e) => setUsername(e.target.value)}
+              required
+              autoFocus
+            />
+          </div>
           <div className={styles.field}>
             <label htmlFor="email">Email</label>
             <input
